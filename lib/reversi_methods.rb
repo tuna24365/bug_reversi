@@ -8,7 +8,6 @@ module ReversiMethods
   BLANK_CELL = '-'
 
   def build_initial_board
-    # boardは盤面を示す二次元配列
     board = Array.new(8) { Array.new(8, BLANK_CELL) }
     board[3][3] = WHITE_STONE # d4
     board[4][4] = WHITE_STONE # e5
@@ -47,7 +46,7 @@ module ReversiMethods
 
     # コピーした盤面にて石の配置を試みて、成功すれば反映する
     copied_board = Marshal.load(Marshal.dump(board))
-    copied_board[pos.col][pos.row] = stone_color
+    copied_board[pos.row][pos.col] = stone_color
 
     turn_succeed = false
     Position::DIRECTIONS.each do |direction|
@@ -63,6 +62,7 @@ module ReversiMethods
   def turn(board, target_pos, attack_stone_color, direction)
     return false if target_pos.out_of_board?
     return false if target_pos.stone_color(board) == attack_stone_color
+    return false if target_pos.stone_color(board) == BLANK_CELL
 
     next_pos = target_pos.next_position(direction)
     if (next_pos.stone_color(board) == attack_stone_color) || turn(board, next_pos, attack_stone_color, direction)
@@ -86,6 +86,7 @@ module ReversiMethods
         return true if put_stone(board, position.to_cell_ref, attack_stone_color, dry_run: true)
       end
     end
+    false
   end
 
   def count_stone(board, stone_color)
